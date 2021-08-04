@@ -1,0 +1,99 @@
+tr {
+  border-bottom: 1px solid #ddd;
+}
+
+td {
+  font-size: 0.9375rem !important;
+  padding: 1rem;
+}
+
+th {
+  padding: 1rem;
+  color: #95aac9 !important;
+  font-size: 0.625rem;
+}
+
+.sort-arrows {
+  height: 0.625rem;
+  margin-left: 0.25rem;
+}
+
+thead {
+  background-color: #f9fbfd;
+}
+
+tr:hover {
+  background-color: #f9fbfd;
+}
+
+table {
+  border-collapse: collapse;
+}
+
+.table-paper {
+  margin: 10px;
+  max-width: max-content;
+  overflow: hidden;
+}
+
+#table-search {
+  border: none;
+  outline-style: none;
+  font-size: 0.9375rem;
+  margin: 0;
+  line-height: 1.5;
+  padding: 0.5rem 0 0.5rem 0;
+  flex: 1 1 auto;
+}
+
+#search-icon {
+  float: left;
+  padding: 0.6rem 0.75rem;
+  padding-left: 0;
+}
+
+.controls {
+  padding: 0.75rem 1.5rem;
+  display: flex;
+  flex-direction: row;
+  flex-shrink: 0;
+}
+
+.cool-select {
+  border: none;
+  font-size: 0.9375rem;
+  border-style: none;
+  user-select: none;
+  cursor: pointer;
+}
+
+.table-filter {
+  border: 1px solid #e3ebf6;
+  font-size: 0.8125rem;
+  padding: 0.3rem 0.8rem;
+  border-radius: 0.25rem;
+  user-select: none;
+  flex: 0 0 auto;
+  height: max-content;
+  margin-top: 0.4rem;
+  /* display: flex; */
+  /* flex-direction: row; */
+  /* justify-content: center; */
+  /* text-align: center; */
+  /* cursor: pointer; */
+}
+
+#sliders {
+  padding: auto;
+}
+
+/* .checkbox {
+  cursor: pointer;
+  height: 1rem;
+  border: transparent;
+  border-radius: 0.375rem;
+  background-color: #e3ebf6;
+  background-position: 50%;
+  background-repeat: no-repeat;
+  margin-left: 0.7rem;
+} */
