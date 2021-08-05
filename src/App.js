@@ -1,11 +1,42 @@
 import { useMemo, useState } from "react";
-import { useTable } from "react-table";
+import {
+  useTable,
+  useFilters,
+  useSortBy,
+  usePagination,
+  useRowSelect,
+} from "react-table";
 import { Paper, Checkbox } from "@material-ui/core";
-import { Search, Search as SearchIcon, Sliders } from "react-feather";
+import {
+  Search as SearchIcon,
+  Sliders,
+  MoreVertical,
+  ArrowLeft,
+  ArrowRight,
+} from "react-feather";
 import "./table.css";
-// todo remove these if neccessary
-// import { Table } from "react-bootstrap";
-// import "bootstrap/dist/css/bootstrap.min.css";
+
+const imgAndName = (name, index) => (
+  <div
+    style={{
+      display: "flex",
+      justifyContent: "left",
+      flexDirection: "row",
+    }}
+  >
+    <img
+      style={{
+        borderRadius: Number.MAX_VALUE,
+        width: "1.625rem",
+        height: "1.625rem",
+        display: "inline-block",
+        marginRight: ".375rem",
+      }}
+      src={`https://dashkit.goodthemes.co/assets/img/avatars/profiles/avatar-${index}.jpg`}
+    />
+    <span>{name}</span>
+  </div>
+);
 
 const dummyData = [
   {
@@ -29,19 +60,40 @@ const dummyData = [
     jobTitle: "Owner",
     email: "adolfo.hess@company.com",
     phone: "(968)682-1364",
-    leadScore: "5/10",
+    leadScore: "7/10",
     company: "Google",
+  },
+  {
+    name: "Daniela Dewitt",
+    jobTitle: "Designer",
+    email: "daniela.dewitt@company.com",
+    phone: "(650)430-9876",
+    leadScore: "4/10",
+    company: "Twitch",
+  },
+  {
+    name: "Miyah Myles",
+    jobTitle: "Founder",
+    email: "miyah.myles@company.com",
+    phone: "(935)165-8435",
+    leadScore: "3/10",
+    company: "Facebook",
+  },
+  {
+    name: "Ryu Duke",
+    jobTitle: "Designer",
+    email: "ryu.duke@company.com",
+    phone: "(937)596-0152",
+    leadScore: "6/10",
+    company: "Netflix",
   },
 ];
 
 const dummyColumns = [
-  // {
-  //   Header: <input type="checkbox" />,
-  //   accessor: "checkbox",
-  // },
   {
     Header: "NAME",
     accessor: "name",
+    Cell: ({ cell }) => imgAndName(cell.value, cell.row.index + 1),
   },
   {
     Header: "JOB TITLE",
@@ -58,6 +110,7 @@ const dummyColumns = [
   {
     Header: "LEAD SCORE",
     accessor: "leadScore",
+    Cell: ({ cell: { value } }) => <Score string={value} />,
   },
   {
     Header: "COMPANY",
@@ -86,7 +139,7 @@ const generateTableCellsFromRow = (row, rowKey) => {
   return (
     <tr key={rowKey}>
       {/* todo add the index as key */}
-      <td>
+      {/* <td>
         <Checkbox
           className="table-checkbox"
           labelStyle={{ color: "black" }}
@@ -100,30 +153,38 @@ const generateTableCellsFromRow = (row, rowKey) => {
             // width: "0.1rem",
           }}
         />
+      </td> */}
+      {row.cells.map((cell, index) => (
+        <td>{cell.render("Cell")}</td>
+      ))}
+      <td>
+        <MoreVertical stroke="#d2ddec" height="0.927rem" />
       </td>
-      {row.cells.map((cell, index) =>
-        cell.column.id == "leadScore" ? (
-          <td>
-            <Score string={cell.value} />
-          </td>
-        ) : (
-          <td>{cell.render("Cell")}</td>
-        )
-      )}
     </tr>
   );
 };
 
-const generateTableHead = (headerGroups) => {
+const generateTableHead = (headerGroups, getHeaderProps) => {
   return (
     <thead>
       {headerGroups.map((headerGroup) => (
         <tr>
-          <th>
+          {/* <th>
             <Checkbox className="table-checkbox" />
-          </th>
+          </th> */}
           {headerGroup.headers.map((column, index) => (
-            <th key={`head-${index}`}>
+            <th
+              {...column.getHeaderProps(column.getSortByToggleProps())}
+              className={
+                column.isSorted
+                  ? column.isSortedDesc
+                    ? "sort-desc"
+                    : "sort-asc"
+                  : ""
+              }
+              key={`head-${index}`}
+              colSpan={column.id === "company" ? 2 : 1}
+            >
               {column.render("Header")}
               <img
                 className="sort-arrows"
@@ -137,17 +198,44 @@ const generateTableHead = (headerGroups) => {
   );
 };
 
-const CustomTable = (props) => {
+const CustomTable = ({ defaultPageSize = 10 }) => {
   // todo const { columns, data } = props;
   let [searchKey, setSearchKey] = useState("");
   const data = useMemo(() => dummyData, []);
   const columns = useMemo(() => dummyColumns, []);
-  const tableInstance = useTable({
-    columns,
-    data,
-  });
-  const { getTableProps, getTableBodyProps, headerGroups, rows, prepareRow } =
-    tableInstance;
+  const tableInstance = useTable(
+    {
+      columns,
+      data,
+      initialState: { pageIndex: 0, pageSize: 10 },
+    },
+    useFilters,
+    useSortBy,
+    usePagination
+    // useRowSelect
+  );
+  const {
+    getTableProps,
+    getTableBodyProps,
+    headerGroups,
+    rows,
+    prepareRow,
+    setFilter,
+    pageOptions,
+    page,
+    state: { pageIndex, pageSize },
+    gotoPage,
+    previousPage,
+    nextPage,
+    setPageSize,
+    canPreviousPage,
+    canNextPage,
+  } = tableInstance;
+  const handleSearchChange = (event) => {
+    const value = event.target.value || undefined;
+    setFilter("name", value || "");
+    setSearchKey(value);
+  };
   return (
     <Paper elevation={2} square={false} className="table-paper">
       <div className="controls">
@@ -159,15 +247,22 @@ const CustomTable = (props) => {
         />
         <input
           value={searchKey}
-          onChange={(event) => setSearchKey(event.target.value)}
+          onChange={handleSearchChange}
           type="search"
           placeholder="Search"
           id="table-search"
         />
-        <select className="cool-select">
-          <option>10 per page</option>
-          <option>5 per page</option>
-          <option>All</option>
+        <select
+          className="cool-select"
+          onChange={(event) => {
+            setPageSize(Number(event.target.value) || defaultPageSize);
+          }}
+          defaultValue={defaultPageSize}
+        >
+          {[5, 10].map((count) => (
+            <option value={count}>{count} per page</option>
+          ))}
+          <option value={Number.MAX_VALUE}>All</option>
         </select>
         <div className="table-filter">
           <Sliders id="sliders" width="0.8125rem" height="0.8125rem" />
@@ -177,18 +272,28 @@ const CustomTable = (props) => {
       <table>
         {generateTableHead(headerGroups)}
         <tbody>
-          {rows.map((row, index) => {
+          {page.map((row, index) => {
             prepareRow(row);
             return generateTableCellsFromRow(row, index);
           })}
         </tbody>
       </table>
+      <div className="table-pages-controls">
+        <div onClick={previousPage} className="previous-page">
+          <ArrowLeft />
+          Prev
+        </div>
+        <div onClick={nextPage} className="next-page">
+          Next
+          <ArrowRight />
+        </div>
+      </div>
     </Paper>
   );
 };
 
-const Contacts = (props, { tableView = true }) => {
-  return tableView ? <CustomTable data={props.data} /> : null;
+const Contacts = ({ data, columns, tableView = true }) => {
+  return tableView ? <CustomTable data={data} columns={columns} /> : null;
 };
 
 function App() {
