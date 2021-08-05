@@ -113,6 +113,10 @@ table {
   color: black;
 }
 
+.disabled {
+  pointer-events: none;
+}
+
 .next-page svg,
 .previous-page svg {
   height: 0.9375rem;
