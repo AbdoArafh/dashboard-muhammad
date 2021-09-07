@@ -121,6 +121,45 @@ table {
 .previous-page svg {
   height: 0.9375rem;
 }
+
+.delete-popup-container {
+  position: fixed;
+  bottom: 1.5rem;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-popup {
+  position: relative;
+  width: fit-content;
+  padding: 0.75rem 1.25rem;
+  background-color: #12263f;
+  color: #95aac9;
+  border-radius: 0.375rem;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+}
+
+.delete-popup .checked-box-icon {
+  padding-right: 0.5rem;
+}
+
+.delete-popup-button {
+  margin: 0 0.5rem;
+  background-color: #415165;
+  color: white;
+  font-size: 0.8125rem;
+  border-radius: 0.25rem;
+  padding: 0.125rem 0.5rem;
+  border: none;
+  outline: none;
+  cursor: pointer;
+}
+
 /* #more-vertical {
   cursor: pointer;
 } */
