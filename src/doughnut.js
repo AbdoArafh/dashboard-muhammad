@@ -51,7 +51,7 @@ const data = {
   ],
 };
 
-function App() {
+function MyDoughnut() {
   return (
     <div style={{ width: "400px" }}>
       <Doughnut
